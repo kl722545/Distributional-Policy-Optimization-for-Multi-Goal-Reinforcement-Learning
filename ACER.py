@@ -17,7 +17,7 @@ from baselines.common.vec_env.subproc_vec_env import SubprocVecEnv
 from baselines.common.vec_env.dummy_vec_env import DummyVecEnv
 
 @_ex.capture
-def cumpute_loss(samples, model, gamma, tau, clip_param, value_loss_coef, trace_clip_max_c, trace_clip_max_rho):
+def cumpute_loss(samples, model, gamma, tau, clip_param, value_loss_coef, trace_clip_max_c, trace_clip_max_rho, use_reward_clip):
   i = 0
   gaes = []
   ratios = []
@@ -25,15 +25,17 @@ def cumpute_loss(samples, model, gamma, tau, clip_param, value_loss_coef, trace_
   critic_loss = 0
   for batch_tran in reversed(list(zip(*samples))):
     state, action, old_log_prob,  reward, next_state, mask = map(lambda item:tensor(item), zip(*batch_tran))
+    if use_reward_clip:
+      reward = torch.clamp(reward, -1, 1)
     reward = reward.unsqueeze(dim=-1)
     mask = mask.unsqueeze(dim=-1)
     new_distri, value = model(state)  
     new_log_prob = new_distri.log_prob(action)
     ratio = (new_log_prob - old_log_prob).exp().sum(-1).unsqueeze(dim=-1)
-    clip_ratio_c = torch.clamp(ratio, 0, trace_clip_max_c).detach()
-    clip_ratio_rho = torch.clamp(ratio, 0, trace_clip_max_rho).detach()
+    clip_ratio_c = torch.clamp(ratio.detach(), 0, trace_clip_max_c)
+    clip_ratio_rho = torch.clamp(ratio.detach(), 0, trace_clip_max_rho)
     delta =  clip_ratio_rho * (reward + gamma * mask * model.eval(next_state).detach() - value)
-    gaes = gaes + [delta + gamma * clip_ratio_c  * (gaes[-1] if len(gaes)!= 0 else 0)]
+    gaes = gaes + [delta + gamma  * tau * clip_ratio_c  * (gaes[-1] if len(gaes)!= 0 else 0)]
     critic_loss += (delta**2).mean()
     ratios = ratios + [ratio]
     i += 1
@@ -50,14 +52,8 @@ def cumpute_loss(samples, model, gamma, tau, clip_param, value_loss_coef, trace_
   return loss
 
 @_ex.capture
-def train(num_processes, max_grad_norm, num_env_steps, log_dir, epoch, _seed, env_name, save_dir):
-  torch.manual_seed(_seed)
-  np.random.seed(_seed)
-  random.seed(_seed)
-
+def train(num_processes, max_grad_norm, num_env_steps, log_dir, epoch, env_name, save_dir, use_linear_clip_decay):
   records = []
-  
-
   envs = [make_env(rank = i) for i in range(num_processes)]
   replaybuffer = Buffer()
   if len(envs) > 1:
@@ -93,7 +89,8 @@ def train(num_processes, max_grad_norm, num_env_steps, log_dir, epoch, _seed, en
       if t % (num_env_steps//num_processes//10) == 0:
         i = t//(num_env_steps//num_processes//10)
         torch.save(model.state_dict(), os.path.join(save_dir, 'ACER',env_name, 'ACER'+str(i)+'.pt'))
-      update_linear_schedule(optimizer, t * num_processes)
+      if use_linear_clip_decay:
+        update_linear_schedule(optimizer, t * num_processes)
     torch.save(model.state_dict(), os.path.join(save_dir, 'ACER',env_name,'ACER_Final.pt'))
     timesteps , sumofrewards = zip(*records)
     savemat(os.path.join(save_dir, 'ACER',env_name,'returns.mat'),{'timesteps':timesteps, 'returns':sumofrewards})
@@ -109,7 +106,10 @@ def train(num_processes, max_grad_norm, num_env_steps, log_dir, epoch, _seed, en
 
 
 @_ex.automain
-def run(log_dir, save_dir, env_name):
+def run(log_dir, save_dir, env_name, seed):
+  torch.manual_seed(seed)
+  np.random.seed(seed)
+  random.seed(seed)
   try:
     os.makedirs(log_dir)
   except OSError:

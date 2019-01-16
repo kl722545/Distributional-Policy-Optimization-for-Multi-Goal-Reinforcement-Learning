@@ -25,9 +25,10 @@ def update_linear_schedule(optimizer, current_env_steps, num_env_steps, lr):
   for param_group in optimizer.param_groups:
     param_group['lr'] = lr
 @_ex.capture    
-def cal_target_distri(prob_next, reward, mask, gamma, atoms, delta_atom, categorical_v_min, categorical_v_max):
+def cal_target_distri(prob_next, reward, mask, gamma, atoms, categorical_num_atom, categorical_v_min, categorical_v_max):
   atoms_next = reward + gamma * mask * atoms.view(1, -1)
   atoms_next.clamp_(categorical_v_min, categorical_v_max)
+  delta_atom = (categorical_v_max - categorical_v_min) / float(categorical_num_atom - 1)
   b = (atoms_next - categorical_v_min) / delta_atom
   l = b.floor()
   u = b.ceil()
