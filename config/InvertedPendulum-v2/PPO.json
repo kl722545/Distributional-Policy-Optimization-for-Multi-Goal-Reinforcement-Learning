@@ -3,14 +3,15 @@
 	"hidden_size": 64,
   	"lr" : 3e-4,
   	"gamma" : 0.995,
-  	"value_loss_coef": 1,
+  	"value_loss_coef": 0.5,
   	"max_grad_norm" : 0.5,
   	"cuda_deterministic": false,
   	"num_processes" : 10,
   	"num_env_steps" : 2000000,
   	"env_name" : "InvertedPendulum-v2",
+	"model_name" : "PPO",
   	"log_dir" : "./log",
-  	"save_dir" : "./trained_model",
+  	"save_dir" : "./trained",
   	"use_cuda" : false,
   	"use_linear_clip_decay" : true,
   	"tau" : 0.95,
@@ -18,8 +19,5 @@
   	"num_cache_epoch" : 10,
   	"epoch" : 10,
   	"num_minibatch" : 32,
-  	"clip_param" : 0.2,
-	"categorical_v_min" : 0,
-  	"categorical_v_max" : 200,
-  	"categorical_num_atom" : 51
+  	"clip_param" : 0.2
 }
