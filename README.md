@@ -67,18 +67,21 @@ in this dictionary. It wiil report the statistics of return over 100 epoch.
     - GPU: Geforce GTX 1080Ti, Geforce GTX 980 
     - CUDA Version: 9.0.176
     - CuDNN Version: 7.1.2
+- Environment
+  - InvertedPendulum-v2
+  - Reacher-v2
 # Experimental Result
 ## On-policy comparasion in inverted pendulum
 The reward curve is smoothed by averaging the returns of recent 500 episodes with one standard deviation shaded area. And the final performance statistics of return over 100 epoch.
 ![DPPO](./image/invertedPendulum-ppo-dppo.png)
 Algorithm  |    min|    max| median | mean std|
 :----------|------:|------:|---------:|----------:|
-PPO        |377.00 |1000.00| 1000.00  |989.98 72.23|
-Distri. PPO|1000.00|1000.00| 1000.00  |1000.00 0.00|
+PPO        |377.00 |1000.00| 1000.00  |989.98\\(\pm\\)72.23|
+Distri. PPO|1000.00|1000.00| 1000.00  |1000.00\\(\pm\\)0.00|
 ## Off-policy comparasion in reacher
 The reward curve is smoothed by averaging the returns of recent 500 episodes with one standard deviation shaded area. And the final performance statistics of return over 100 epoch.
 ![DACER](./image/reacher-acer-dacer.png)
 Algorithm   |    min|    max| median   | mean std  |
 :-----------|------:|------:|---------:|----------:|
-ACER        |-21.01 |-2.02  | -10.33   |-11.02 4.67|
-Distri. ACER|-16.28 |-3.47  | -9.67    |-9.79 3.10 |
+ACER        |-21.01 |-2.02  | -10.33   |-11.02\\(\pm\\)4.67|
+Distri. ACER|-16.28 |-3.47  | -9.67    |-9.79\\(\pm\\)3.10 |
