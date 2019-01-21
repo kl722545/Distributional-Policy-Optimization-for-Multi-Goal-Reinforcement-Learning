@@ -2,6 +2,7 @@
 <p align="center">
 <img src="./image/overall_model_AC.png" alt="drawing" width = "65%"/>
 </p>
+
 In this respository, we implmented our proposed distributional policy optimization model for continuous control tasks. Environments where we evaluated can be find in **Experimental Settings** section.  
 
 Our distributional policy optimization model consists of an actor network and a **distributional** value network. This is an actor critic structure but with a different alogrithm to optimize. Our algorithm is adopted to estimate the value distribution or the distribution of the sum of discounted rewards where the algorithm is under an actor critic structure to deal with robotic control problems. We present a distributional policy optimization where a trajectory is taken into account to carry out the value distribution for policy optimization. We also compare the result with other algorithms like proximal policy optimization (PPO) and actor critic experience replay (ACER).
@@ -74,6 +75,7 @@ in this dictionary. It wiil report the statistics of return over 100 epoch.
 # Experimental Result
 ## On-policy comparasion in inverted pendulum
 The reward curve is smoothed by averaging the returns of recent 500 episodes with one standard deviation shaded area. And the final performance statistics of return over 100 epoch.
+<p align="center">
 ![DPPO](./image/invertedPendulum-ppo-dppo.png)
 
 
@@ -81,8 +83,11 @@ Algorithm  |    min|    max| median | mean std
 :----------|------:|------:|---------:|----------:
 PPO        |377.00 |1000.00| 1000.00  |989.98±72.23
 Distri. PPO|1000.00|1000.00| 1000.00  |1000.00±0.00
+
+</p>
 ## Off-policy comparasion in reacher
 The reward curve is smoothed by averaging the returns of recent 500 episodes with one standard deviation shaded area. And the final performance statistics of return over 100 epoch.
+<p align="center">
 ![DACER](./image/reacher-acer-dacer.png)
 
 
@@ -90,3 +95,4 @@ Algorithm   |    min|    max| median   | mean std
 :-----------|------:|------:|---------:|----------:
 ACER        |-21.01 |-2.02  | -10.33   |-11.02±4.67
 Distri. ACER|-16.28 |-3.47  | -9.67    |-9.79±3.10 
+</p>
