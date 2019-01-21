@@ -1,5 +1,7 @@
 # Distributional Policy Optimization for Multi-Goal Reinforcement Learning
-<img src="./image/overall_model_AC.png" alt="drawing" display = "block" margin-left = "auto" margin-right = "auto" width = "65%"/>
+<p align="center">
+<img src="./image/overall_model_AC.png" alt="drawing" width = "65%"/>
+</p>
 In this respository, we implmented our proposed distributional policy optimization model for continuous control tasks. Environments where we evaluated can be find in **Experimental Settings** section.  
 
 Our distributional policy optimization model consists of an actor network and a **distributional** value network. This is an actor critic structure but with a different alogrithm to optimize. Our algorithm is adopted to estimate the value distribution or the distribution of the sum of discounted rewards where the algorithm is under an actor critic structure to deal with robotic control problems. We present a distributional policy optimization where a trajectory is taken into account to carry out the value distribution for policy optimization. We also compare the result with other algorithms like proximal policy optimization (PPO) and actor critic experience replay (ACER).
