@@ -15,11 +15,11 @@ Our distributional policy optimization model consists of an actor network and a 
   - pytorch
     - to train model
   - OpenAI baselines
-    - for parallel enviroment
+    - to parallel enviroment
   - OpenAI gym
     - enviroment 
   - mujoco
-    - The preliminary of gym for continuous control
+    - preliminary of gym for continuous control
   - sacred
     - hyperparameter management
   
