@@ -50,7 +50,7 @@ Simply test the model typing the command
 ```
 $ python test.py with /path/to/your/config/file.json
 ```
-in this dictionary. It wiil report the statistics of return over 100 epoch. 
+in this dictionary. It will report the statistics of return over 100 epoch. 
 
 # Experimental Settings
 - Framework
