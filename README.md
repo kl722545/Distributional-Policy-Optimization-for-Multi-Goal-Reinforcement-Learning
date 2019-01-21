@@ -82,7 +82,7 @@ The reward curve is smoothed by averaging the returns of recent 500 episodes wit
 Algorithm  |    min|    max| median | mean std
 :----------|------:|------:|---------:|----------:
 PPO        |377.00 |1000.00| 1000.00  |989.98±72.23
-Distri. PPO|1000.00|1000.00| 1000.00  |1000.00±0.00
+Distri. PPO|**1000.00**|1000.00| 1000.00  |**1000.00**±**0.00**
 
 ## Off-policy comparasion in reacher
 The reward curve is smoothed by averaging the returns of recent 500 episodes with one standard deviation shaded area. And the final performance statistics of return over 100 epoch.
@@ -92,6 +92,6 @@ The reward curve is smoothed by averaging the returns of recent 500 episodes wit
 
 Algorithm   |    min|    max| median   | mean std  
 :-----------|------:|------:|---------:|----------:
-ACER        |-21.01 |-2.02  | -10.33   |-11.02±4.67
-Distri. ACER|-16.28 |-3.47  | -9.67    |-9.79±3.10 
+ACER        |-21.01 |**-2.02**  | -10.33   |-11.02±4.67
+Distri. ACER|**-16.28** |-3.47  | **-9.67**    |**-9.79**±**3.10** 
 
