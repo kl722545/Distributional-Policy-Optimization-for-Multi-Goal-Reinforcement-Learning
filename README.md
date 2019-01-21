@@ -1,5 +1,5 @@
 # Distributional Policy Optimization for Multi-Goal Reinforcement Learning
-![AC Model](./image/overall_model_AC.png=250x)
+![AC Model](./image/overall_model_AC.png =250x)
 
 In this respository, we implmented our proposed distributional policy optimization model for continuous control tasks. Environments where we evaluated can be find in **Experimental Settings** section.  
 
