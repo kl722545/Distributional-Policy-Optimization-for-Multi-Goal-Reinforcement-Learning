@@ -74,6 +74,8 @@ in this dictionary. It wiil report the statistics of return over 100 epoch.
 ## On-policy comparasion in inverted pendulum
 The reward curve is smoothed by averaging the returns of recent 500 episodes with one standard deviation shaded area. And the final performance statistics of return over 100 epoch.
 ![DPPO](./image/invertedPendulum-ppo-dppo.png)
+
+
 Algorithm  |    min|    max| median | mean std
 :----------|------:|------:|---------:|----------:
 PPO        |377.00 |1000.00| 1000.00  |989.98\\(\pm\\)72.23
@@ -81,6 +83,8 @@ Distri. PPO|1000.00|1000.00| 1000.00  |1000.00\\(\pm\\)0.00
 ## Off-policy comparasion in reacher
 The reward curve is smoothed by averaging the returns of recent 500 episodes with one standard deviation shaded area. And the final performance statistics of return over 100 epoch.
 ![DACER](./image/reacher-acer-dacer.png)
+
+
 Algorithm   |    min|    max| median   | mean std  
 :-----------|------:|------:|---------:|----------:
 ACER        |-21.01 |-2.02  | -10.33   |-11.02\\(\pm\\)4.67
