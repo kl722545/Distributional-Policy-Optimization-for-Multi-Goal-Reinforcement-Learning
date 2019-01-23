@@ -1,5 +1,6 @@
 from common.config import _ex
 from scipy.io import savemat
+from collections import deque
 
 import os
 import glob
@@ -10,25 +11,21 @@ import numpy as np
 import random
 import gym
 
-from common.environment import make_env
-from common.model import Model, DistributionalModel, Buffer
-from common.misc import to_np, tensor, update_linear_schedule, ppo_loss, dppo_loss, acer_loss, dacer_loss
+from common.environment import make_goal_env
+from common.model import GoalModel, DistributionalGoalModel, GoalBuffer
+from common.misc import to_np, tensor, update_linear_schedule, acher_loss, dacher_loss
 
 from baselines.common.vec_env.subproc_vec_env import SubprocVecEnv
 from baselines.common.vec_env.dummy_vec_env import DummyVecEnv
 
 
 model_dict = {
-  'PPO': lambda state_shape, action_shape: Model(state_shape, action_shape),
-  'DPPO': lambda state_shape, action_shape: DistributionalModel(state_shape, action_shape),
-  'ACER': lambda state_shape, action_shape: Model(state_shape, action_shape),
-  'DACER': lambda state_shape, action_shape: DistributionalModel(state_shape, action_shape)
+  'ACHER': lambda state_shape, goal_shape, action_shape: GoalModel(state_shape, goal_shape, action_shape),
+  'DACHER': lambda state_shape, goal_shape, action_shape: DistributionalGoalModel(state_shape, goal_shape, action_shape)
 }
 loss_dict = {
-  'PPO': lambda samples, model: ppo_loss(samples, model),
-  'DPPO': lambda samples, model: dppo_loss(samples, model),
-  'ACER': lambda samples, model: acer_loss(samples, model),
-  'DACER': lambda samples, model: dacer_loss(samples, model)
+  'ACHER': lambda samples, model: acher_loss(samples, model),
+  'DACHER': lambda samples, model: dacher_loss(samples, model)
 }
 
 
@@ -36,33 +33,39 @@ loss_dict = {
 @_ex.capture
 def train(model_name, num_processes, max_grad_norm, num_env_steps, log_dir, epoch, env_name, save_dir, use_linear_clip_decay):
   records = []
-  envs = [make_env(rank = i) for i in range(num_processes)]
-  replaybuffer = Buffer()
+  envs = [make_goal_env(rank = i) for i in range(num_processes)]
+  replaybuffer = GoalBuffer(lambda desired_goal, achieved_goal :  -10 *((desired_goal-achieved_goal)**2).sum() ** 0.5)
   if len(envs) > 1:
     envs = SubprocVecEnv(envs)
   else:
     envs = DummyVecEnv(envs)
   try:
-    state_shape = envs.observation_space.shape[0]
+    state_shape = envs.observation_space.spaces['observation'].shape[0]
+    goal_shape = envs.observation_space.spaces['achieved_goal'].shape[0]
     action_shape = envs.action_space.shape[0]
-    model = model_dict[model_name](state_shape, action_shape)
+    model = model_dict[model_name](state_shape, goal_shape, action_shape)
     cumpute_loss = loss_dict[model_name]
     optimizer = torch.optim.Adam(model.parameters())
-    state = envs.reset()
+    state_dict = envs.reset()
     returns = 0
     for t in range(num_env_steps//num_processes):
-      action, log_prob = model.act(state)
-      next_state, reward, done, info = envs.step(to_np(action))
+      state = np.array([sd['observation'] for sd in state_dict])
+      desired_goal = np.array([sd['desired_goal'] for sd in state_dict])
+      achieved_goal = np.array([sd['achieved_goal'] for sd in state_dict])
+      action, log_prob = model.act(state, achieved_goal)
+      next_state_dict, reward, done, info = envs.step(to_np(action))
+      next_state = np.array([sd['observation'] for sd in next_state_dict])
       returns += reward
-      replaybuffer.store(zip(state, to_np(action), to_np(log_prob), reward, next_state, 1 - done))
+      replaybuffer.store(list(zip(state, desired_goal, achieved_goal, to_np(action), to_np(log_prob), reward, next_state, 1 - done)))
       for i, d in enumerate(done):
         if d:
           records.append((t * num_processes + i, returns[i]))
+          goal = achieved_goal[i]
+          replaybuffer.cal_hindsight_reward(goal, i)
           if i==0:
             print(returns[0])
           returns[i] = 0
-      state = next_state
-
+      state_dict = next_state_dict
       if t % 500//num_processes == (500//num_processes-1):
         for _ in range(epoch):
           optimizer.zero_grad()
@@ -70,8 +73,6 @@ def train(model_name, num_processes, max_grad_norm, num_env_steps, log_dir, epoc
           loss.backward()
           nn.utils.clip_grad_norm_(model.parameters(), max_grad_norm)
           optimizer.step()
-        if model_name == 'PPO' or model_name == 'DPPO':
-          replaybuffer.clear()
 
       if t % (num_env_steps//num_processes//10) == 0:
         i = t//(num_env_steps//num_processes//10)
