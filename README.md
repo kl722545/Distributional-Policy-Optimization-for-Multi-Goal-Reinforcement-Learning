@@ -51,7 +51,12 @@ Simply test the model typing the command
 $ python test.py with /path/to/your/config/file.json
 ```
 in this dictionary. It will report the statistics of return over 100 epoch. 
-
+# How to test the model
+Simply record the model typing the command
+```
+$ python record.py with /path/to/your/config/file.json
+```
+in this dictionary. Then use matlab to get the result.
 # Experimental Settings
 - Framework
     - python 3.5.2
