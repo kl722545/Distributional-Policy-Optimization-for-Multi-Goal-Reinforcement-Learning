@@ -78,7 +78,7 @@ in this dictionary. Then use matlab to get the result.
   - InvertedPendulum-v2
   - Reacher-v2
 # Experimental Result
-## On-policy comparasion in inverted pendulum
+## On-policy comparison in inverted pendulum
 The reward curve is smoothed by averaging the returns of recent 500 episodes with one standard deviation shaded area. And the final performance statistics of return over 100 epoch.
 
 ![DPPO](./image/invertedPendulum-ppo-dppo.png)
@@ -89,7 +89,7 @@ Algorithm  |    min|    max| median | mean std
 PPO        |377.00 |1000.00| 1000.00  |989.98±72.23
 Distri. PPO|**1000.00**|1000.00| 1000.00  |**1000.00**±**0.00**
 
-## Off-policy comparasion in reacher
+## Off-policy comparison in reacher
 The reward curve is smoothed by averaging the returns of recent 500 episodes with one standard deviation shaded area. And the final performance statistics of return over 100 epoch.
 
 ![DACER](./image/reacher-acer-dacer.png)
